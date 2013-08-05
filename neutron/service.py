@@ -89,7 +89,6 @@ class NeutronApiService(WsgiService):
 
 
 def serve_wsgi(cls):
-
     try:
         try:
             service = cls.create()

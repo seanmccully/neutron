@@ -514,7 +514,7 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                                                               id, None)
             self._extend_network_dict_provider(context, net)
         return self._fields(net, fields)
-
+    
     def get_networks(self, context, filters=None, fields=None,
                      sorts=None,
                      limit=None, marker=None, page_reverse=False):
@@ -527,6 +527,7 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                 self._extend_network_dict_provider(context, net)
 
         return [self._fields(net, fields) for net in nets]
+
 
     def create_port(self, context, port):
         # Set port status as 'DOWN'. This will be updated by agent

@@ -218,6 +218,13 @@ class NeutronDbPluginV2(neutron_plugin_base_v2.NeutronPluginBaseV2,
         return dict((k, v) for (k, v) in
                     data.iteritems() if k in columns)
 
+    def _get_group(self, context, id):
+        try:
+            group = self._get_by_id(context, models_v2.Group, id)
+        except exc.NoResultFound:
+            raise q_exc.GroupNotFound(group_id=id)
+        return group
+
     def _get_network(self, context, id):
         try:
             network = self._get_by_id(context, models_v2.Network, id)
@@ -855,6 +862,14 @@ class NeutronDbPluginV2(neutron_plugin_base_v2.NeutronPluginBaseV2,
                 func(self, res, network)
         return self._fields(res, fields)
 
+    def _make_group_dict(self, group, fields=None):
+            res = { 'id': group['id'],
+                    'tenant_id': group['tenant_id'],
+                    'name' : group['name'],
+                    'description': group['description']}
+
+            return self._fields(res, fields)
+
     def _make_subnet_dict(self, subnet, fields=None):
         res = {'id': subnet['id'],
                'name': subnet['name'],
@@ -919,6 +934,34 @@ class NeutronDbPluginV2(neutron_plugin_base_v2.NeutronPluginBaseV2,
         if limit and marker:
             return getattr(self, '_get_%s' % resource)(context, marker)
         return None
+
+    def create_group(self, context, group):
+        """Handle creation of a group""" 
+        # single request processing
+        group = group['group']
+        tenant_id = self._get_tenant_id_for_create(context, group)
+        with context.session.begin(subtransactions=True):
+            args = {'tenant_id': tenant_id,
+                    'id': group.get('id') or uuidutils.generate_uuid(),
+                    'name': group['name'],
+                    'description': group['description']}
+            group = models_v2.Group(**args)
+            context.session.add(group)
+
+        return self._make_group_dict(group)
+
+    def update_group(self, context, id, group):
+        """Handle update of a group"""
+        group_dict = group['group']
+        with context.session.begin(subtransactions=True):
+            group = self._get_group(context, id)
+            group.update(group_dict)
+        return self._make_group_dict(group)
+
+    def delete_group(self, context, id):
+        with context.session.begin(subtransactions=True):
+            group = self._get_group(context, id)
+            context.session.delete(group)
 
     def create_network_bulk(self, context, networks):
         return self._create_bulk('network', context, networks)
@@ -997,6 +1040,23 @@ class NeutronDbPluginV2(neutron_plugin_base_v2.NeutronPluginBaseV2,
     def get_networks_count(self, context, filters=None):
         return self._get_collection_count(context, models_v2.Network,
                                           filters=filters)
+
+    def get_group(self, context, id, fields=None):   
+        group = self._get_group(context, id)
+        return self._make_group_dict(group, fields)
+
+    def get_groups(self, context, filters=None, fields=None, limit=None,
+                    marker=None, sorts=None, page_reverse=False):   
+        marker_obj = self._get_marker_obj(context, 'group', limit, marker)
+        return self._get_collection(context, models_v2.Group,
+                                    self._make_group_dict,
+                                    filters=filters, fields=fields,
+                                    sorts=sorts,
+                                    limit=limit,
+                                    marker_obj=marker_obj,
+                                    page_reverse=page_reverse)
+
+
 
     def create_subnet_bulk(self, context, subnets):
         return self._create_bulk('subnet', context, subnets)

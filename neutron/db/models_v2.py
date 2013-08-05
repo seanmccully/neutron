@@ -181,4 +181,3 @@ class Group(model_base.BASEV2, HasId, HasTenant):
 
     name = sa.Column(sa.String(255))
     description = sa.Column(sa.String(255))
-

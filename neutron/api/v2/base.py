@@ -526,6 +526,7 @@ class Controller(object):
 
         body argument must be the deserialized body.
         """
+
         collection = resource + "s"
         if not body:
             raise webob.exc.HTTPBadRequest(_("Resource body required"))
@@ -545,6 +546,7 @@ class Controller(object):
             if not bulk_body:
                 raise webob.exc.HTTPBadRequest(_("Resources required"))
             return {collection: bulk_body}
+
 
         res_dict = body.get(resource)
         if res_dict is None:
