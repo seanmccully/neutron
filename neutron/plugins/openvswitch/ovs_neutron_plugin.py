@@ -44,6 +44,7 @@ from neutron.db import l3_rpc_base
 from neutron.db import portbindings_db
 from neutron.db import quota_db  # noqa
 from neutron.db import securitygroups_rpc_base as sg_db_rpc
+from neutron.db import topology
 from neutron.extensions import portbindings
 from neutron.extensions import providernet as provider
 from neutron.openstack.common import importutils
@@ -222,7 +223,8 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                          sg_db_rpc.SecurityGroupServerRpcMixin,
                          agentschedulers_db.L3AgentSchedulerDbMixin,
                          agentschedulers_db.DhcpAgentSchedulerDbMixin,
-                         portbindings_db.PortBindingMixin):
+                         portbindings_db.PortBindingMixin,
+                         topology.TopologyDbMixin):
 
     """Implement the Neutron abstractions using Open vSwitch.
 
@@ -251,7 +253,7 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
     _supported_extension_aliases = ["provider", "router", "ext-gw-mode",
                                     "binding", "quotas", "security-group",
                                     "agent", "extraroute",
-                                    "l3_agent_scheduler",
+                                    "l3_agent_scheduler", "topology",
                                     "dhcp_agent_scheduler"]
 
     @property
@@ -514,7 +516,7 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                                                               id, None)
             self._extend_network_dict_provider(context, net)
         return self._fields(net, fields)
-
+    
     def get_networks(self, context, filters=None, fields=None,
                      sorts=None,
                      limit=None, marker=None, page_reverse=False):
@@ -527,6 +529,7 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                 self._extend_network_dict_provider(context, net)
 
         return [self._fields(net, fields) for net in nets]
+
 
     def create_port(self, context, port):
         # Set port status as 'DOWN'. This will be updated by agent

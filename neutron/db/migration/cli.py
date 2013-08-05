@@ -17,6 +17,7 @@
 # @author: Mark McClain, DreamHost
 
 import os
+import sys
 
 from alembic import command as alembic_command
 from alembic import config as alembic_config
@@ -140,4 +141,9 @@ def main():
     CONF()
     #TODO(gongysh) enable logging
     legacy.modernize_quantum_config(CONF)
+
     CONF.command.func(config, CONF.command.name)
+
+
+if __name__ == "__main__":
+   sys.exit(main())

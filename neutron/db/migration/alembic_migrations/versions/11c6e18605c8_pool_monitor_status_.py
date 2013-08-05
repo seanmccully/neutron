@@ -33,6 +33,7 @@ migration_for_plugins = [
     'neutron.services.loadbalancer.plugin.LoadBalancerPlugin',
 ]
 
+from alembic import context
 from alembic import op
 import sqlalchemy as sa
 
@@ -44,8 +45,7 @@ def upgrade(active_plugins=None, options=None):
         return
 
     op.add_column('poolmonitorassociations', sa.Column('status',
-                                                       sa.String(16),
-                                                       nullable=False))
+                  sa.String(16), nullable=False, server_default="ACTIVE"))
     op.add_column('poolmonitorassociations', sa.Column('status_description',
                                                        sa.String(255)))
 
@@ -57,5 +57,15 @@ def downgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
         return
 
-    op.drop_column('poolmonitorassociations', 'status')
-    op.drop_column('poolmonitorassociations', 'status_description')
+    if migration.migration_engine(context) != 'sqlite':
+        op.drop_column('poolmonitorassociations', 'status_description')
+        op.drop_column('poolmonitorassociations', 'status')
+
+    else:
+
+        migration.rename_table(entity)
+        migration.create_table(
+            u'poolmonitorassociations',
+            sa.Column(u'pool_id', sa.String(36), nullable=False),
+            sa.Column(u'monitor_id', sa.String(36), nullable=False),
+            op=op)

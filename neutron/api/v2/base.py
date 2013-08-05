@@ -349,6 +349,7 @@ class Controller(object):
         else:
             items = [body]
             bulk = False
+
         for item in items:
             self._validate_network_tenant_ownership(request,
                                                     item[self._resource])
@@ -545,6 +546,7 @@ class Controller(object):
             if not bulk_body:
                 raise webob.exc.HTTPBadRequest(_("Resources required"))
             return {collection: bulk_body}
+
 
         res_dict = body.get(resource)
         if res_dict is None:

@@ -69,9 +69,11 @@ class APIRouter(wsgi.Router):
 
     @classmethod
     def factory(cls, global_config, **local_config):
+        LOG.debug("APIRouter.factory called")
         return cls(**local_config)
 
     def __init__(self, **local_config):
+        LOG.debug("APIRouter.__init__ called")
         mapper = routes_mapper.Mapper()
         plugin = manager.NeutronManager.get_plugin()
         ext_mgr = extensions.PluginAwareExtensionManager.get_instance()
@@ -84,6 +86,8 @@ class APIRouter(wsgi.Router):
             allow_bulk = cfg.CONF.allow_bulk
             allow_pagination = cfg.CONF.allow_pagination
             allow_sorting = cfg.CONF.allow_sorting
+            LOG.debug("[_map_resource] collection[%s], resource[%s], plugin[%s], params[%s]" %  (collection, resource,
+                plugin, params))
             controller = base.create_resource(
                 collection, resource, plugin, params, allow_bulk=allow_bulk,
                 parent=parent, allow_pagination=allow_pagination,
@@ -114,3 +118,4 @@ class APIRouter(wsgi.Router):
                           SUB_RESOURCES[resource]['parent'])
 
         super(APIRouter, self).__init__(mapper)
+

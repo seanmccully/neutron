@@ -1006,6 +1006,8 @@ class NeutronDbPluginV2(neutron_plugin_base_v2.NeutronPluginBaseV2,
         return self._get_collection_count(context, models_v2.Network,
                                           filters=filters)
 
+
+
     def create_subnet_bulk(self, context, subnets):
         return self._create_bulk('subnet', context, subnets)
 

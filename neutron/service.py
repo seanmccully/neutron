@@ -89,7 +89,6 @@ class NeutronApiService(WsgiService):
 
 
 def serve_wsgi(cls):
-
     try:
         try:
             service = cls.create()
@@ -130,7 +129,6 @@ class Service(service.Service):
     def __init__(self, host, binary, topic, manager, report_interval=None,
                  periodic_interval=None, periodic_fuzzy_delay=None,
                  *args, **kwargs):
-
         self.binary = binary
         self.manager_class_name = manager
         manager_class = importutils.import_class(self.manager_class_name)

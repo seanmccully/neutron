@@ -22,6 +22,7 @@ LOADBALANCER = "LOADBALANCER"
 FIREWALL = "FIREWALL"
 VPN = "VPN"
 METERING = "METERING"
+SDN = "SDN"
 
 #maps extension alias to service type
 EXT_TO_SERVICE_MAPPING = {
@@ -30,10 +31,11 @@ EXT_TO_SERVICE_MAPPING = {
     'fwaas': FIREWALL,
     'vpnaas': VPN,
     'metering': METERING,
+    'sdn' : SDN,
 }
 
 # TODO(salvatore-orlando): Move these (or derive them) from conf file
-ALLOWED_SERVICES = [CORE, DUMMY, LOADBALANCER, FIREWALL, VPN, METERING]
+ALLOWED_SERVICES = [CORE, DUMMY, LOADBALANCER, FIREWALL, VPN, METERING, SDN]
 
 COMMON_PREFIXES = {
     CORE: "",
@@ -41,8 +43,8 @@ COMMON_PREFIXES = {
     LOADBALANCER: "/lb",
     FIREWALL: "/fw",
     VPN: "/vpn",
-    METERING: "/metering",
-}
+    SDN: "/sdn",
+    }
 
 # Service operation status constants
 ACTIVE = "ACTIVE"

@@ -39,6 +39,7 @@ migration_for_plugins = [
     'neutron.plugins.ryu.ryu_neutron_plugin.RyuNeutronPluginV2'
 ]
 
+from alembic import context
 from alembic import op
 import sqlalchemy as sa
 
@@ -51,13 +52,31 @@ def upgrade(active_plugins=None, options=None):
         return
 
     op.add_column('routers', sa.Column('enable_snat', sa.Boolean(),
-                                       nullable=False, default=True))
+                                       nullable=False, default=True,
+                                       server_default="1"))
     # Set enable_snat to True for existing routers
-    op.execute("UPDATE routers SET enable_snat=True")
+    if migration.migration_engine(context) != 'sqlite':
+        op.execute("UPDATE routers SET enable_snat=True")
+    else:
+        op.execute("UPDATE routers SET enable_snat=1")
 
 
 def downgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
         return
 
-    op.drop_column('routers', 'enable_snat')
+    if migration.migration_engine(context) != 'sqlite':
+        op.drop_column('routers', 'enable_snat')
+    else:
+        migration.rename_table('routers', op)
+        migration.create_table(
+            u'routers',
+            sa.Column(u'tenant_id', sa.String(255), nullable=True),
+            sa.Column(u'id', sa.String(36), nullable=False),
+            sa.Column(u'name', sa.String(255), nullable=True),
+            sa.Column(u'status', sa.String(16), nullable=False),
+            sa.Column(u'admin_state_up', sa.Boolean(), nullable=False),
+            sa.Column(u'gw_port_id', sa.String(36), nullable=False),
+            sa.ForeignKeyConstraint(['gw_port_id'], [u'ports.id'], ),
+            sa.PrimaryKeyConstraint(u'id'),
+            op=op)

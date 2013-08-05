@@ -33,9 +33,11 @@ migration_for_plugins = [
     'neutron.services.loadbalancer.plugin.LoadBalancerPlugin',
 ]
 
-from alembic import op
-import sqlalchemy as sa
 
+from alembic import context
+from alembic import op
+from neutron.plugins.common.constants import PENDING_CREATE
+import sqlalchemy as sa
 
 from neutron.db import migration
 
@@ -43,16 +45,39 @@ from neutron.db import migration
 def upgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
         return
-    op.drop_column('healthmonitors', 'status')
-    op.drop_column('healthmonitors', 'status_description')
+    if migration.migration_engine(context) != 'sqlite':
+        op.drop_column('healthmonitors', 'status')
+        op.drop_column('healthmonitors', 'status_description')
+    else:
+        migration.rename_table(entity)
+        migration.create_table(
+            u'healthmonitors',
+            sa.Column(u'tenant_id', sa.String(255), nullable=True),
+            sa.Column(u'id', sa.String(36), nullable=False),
+            sa.Column(u'type',
+                      sa.Enum("PING",
+                              "TCP",
+                              "HTTP",
+                              "HTTPS",
+                              name="healthmontiors_type"),
+                      nullable=False),
+            sa.Column(u'delay', sa.Integer(), nullable=False),
+            sa.Column(u'timeout', sa.Integer(), nullable=False),
+            sa.Column(u'max_retries', sa.Integer(), nullable=False),
+            sa.Column(u'http_method', sa.String(16), nullable=True),
+            sa.Column(u'url_path', sa.String(255), nullable=True),
+            sa.Column(u'expected_codes', sa.String(64), nullable=True),
+            sa.Column(u'admin_state_up', sa.Boolean(), nullable=False),
+            sa.PrimaryKeyConstraint(u'id'),
+            op=op)
 
 
 def downgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
         return
 
-    op.add_column('healthmonitors', sa.Column('status',
-                                              sa.String(16),
-                                              nullable=False))
+    op.add_column('healthmonitors', sa.Column('status', sa.String(16),
+                                              nullable=False,
+                                              server_default=PENDING_CREATE))
     op.add_column('healthmonitors', sa.Column('status_description',
                                               sa.String(255)))
