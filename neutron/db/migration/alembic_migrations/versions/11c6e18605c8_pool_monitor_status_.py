@@ -45,7 +45,7 @@ def upgrade(active_plugins=None, options=None):
 
     op.add_column('poolmonitorassociations', sa.Column('status',
                                                        sa.String(16),
-                                                       nullable=False))
+                                                       nullable=False, server_default="ACTIVE"))
     op.add_column('poolmonitorassociations', sa.Column('status_description',
                                                        sa.String(255)))
 
@@ -57,5 +57,18 @@ def downgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
         return
 
-    op.drop_column('poolmonitorassociations', 'status')
-    op.drop_column('poolmonitorassociations', 'status_description')
+    try:
+        op.drop_column('poolmonitorassociations', 'status_description')
+        op.drop_column('poolmonitorassociations', 'status')
+
+    except sa.exc.OperationalError:
+        op.rename_table('poolmonitorassociations', '_poolmonitorassociations')
+        op.create_table(
+            u'poolmonitorassociations',
+            sa.Column(u'pool_id', sa.String(36), nullable=False),
+            sa.Column(u'monitor_id', sa.String(36), nullable=False))
+        op.execute("""INSERT INTO poolmonitorassociations (pool_id, monitor_id)
+                   SELECT pool_id, monitor_id FROM _poolmonitorassociations""")
+        op.drop_table('_poolmonitorassociations')
+
+

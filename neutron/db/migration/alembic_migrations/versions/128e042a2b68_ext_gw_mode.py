@@ -51,13 +51,31 @@ def upgrade(active_plugins=None, options=None):
         return
 
     op.add_column('routers', sa.Column('enable_snat', sa.Boolean(),
-                                       nullable=False, default=True))
+                                       nullable=False, default=True, server_default="1"))
     # Set enable_snat to True for existing routers
-    op.execute("UPDATE routers SET enable_snat=True")
+    op.execute("UPDATE routers SET enable_snat=1")
 
 
 def downgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
         return
 
-    op.drop_column('routers', 'enable_snat')
+    try:
+        op.drop_column('routers', 'enable_snat')
+    except sa.exc.OperationalError:
+        op.rename_table('routers', '_routers')
+        op.create_table(
+            u'routers',
+            sa.Column(u'tenant_id', sa.String(255), nullable=True),
+            sa.Column(u'id', sa.String(36), nullable=False),
+            sa.Column(u'name', sa.String(255), nullable=True),
+            sa.Column(u'status', sa.String(16), nullable=False),
+            sa.Column(u'admin_state_up', sa.Boolean(), nullable=False),
+            sa.Column(u'gw_port_id', sa.String(36), nullable=False),
+            sa.ForeignKeyConstraint(['gw_port_id'], [u'ports.id'], ),
+            sa.PrimaryKeyConstraint(u'id')
+        )
+        op.execute("""INSERT INTO routers (tenant_id, id, name, status,
+                    admin_state_up, gw_port_id) SELECT tenant_id, id, name,
+                    status, admin_state_up, gw_port_id FROM _routers""")
+        op.drop_table("_routers")

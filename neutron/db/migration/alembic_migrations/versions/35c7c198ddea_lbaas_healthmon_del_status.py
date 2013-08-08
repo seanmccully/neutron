@@ -43,9 +43,37 @@ from neutron.db import migration
 def upgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
         return
-    op.drop_column('healthmonitors', 'status')
-    op.drop_column('healthmonitors', 'status_description')
-
+    try:
+        op.drop_column('healthmonitors', 'status')
+        op.drop_column('healthmonitors', 'status_description')
+    except sa.exc.OperationalError:
+        op.rename_table('healthmonitors', '_healthmonitors')
+        op.create_table(
+            u'healthmonitors',
+            sa.Column(u'tenant_id', sa.String(255), nullable=True),
+            sa.Column(u'id', sa.String(36), nullable=False),
+            sa.Column(u'type',
+                  sa.Enum("PING",
+                          "TCP",
+                          "HTTP",
+                          "HTTPS",
+                          name="healthmontiors_type"),
+                  nullable=False),
+            sa.Column(u'delay', sa.Integer(), nullable=False),
+            sa.Column(u'timeout', sa.Integer(), nullable=False),
+            sa.Column(u'max_retries', sa.Integer(), nullable=False),
+            sa.Column(u'http_method', sa.String(16), nullable=True),
+            sa.Column(u'url_path', sa.String(255), nullable=True),
+            sa.Column(u'expected_codes', sa.String(64), nullable=True),
+            sa.Column(u'admin_state_up', sa.Boolean(), nullable=False),
+            sa.PrimaryKeyConstraint(u'id'))
+        op.execute("""INSERT INTO healthmonitors
+                        (tenant_id, id, type, delay, timeout, max_retries,
+                        http_method, url_path, expected_codes, admin_state_up)
+                        SELECT tenant_id, id, type, delay, timeout, max_retries,
+                        http_method, url_path, expected_codes, admin_state_up
+                        FROM _healthmonitors""")
+        op.drop_table('_healthmonitors')
 
 def downgrade(active_plugins=None, options=None):
     if not migration.should_run(active_plugins, migration_for_plugins):
@@ -53,6 +81,6 @@ def downgrade(active_plugins=None, options=None):
 
     op.add_column('healthmonitors', sa.Column('status',
                                               sa.String(16),
-                                              nullable=False))
+                                              nullable=False, server_default="ACTIVE"))
     op.add_column('healthmonitors', sa.Column('status_description',
                                               sa.String(255)))
