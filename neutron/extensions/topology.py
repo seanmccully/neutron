@@ -109,3 +109,5 @@ class Topology(object):
     def _delete_group_handler(self, input_dict, req, id):
         return "Group {0} Deleted.".format(
             input_dict['TOPOLOGY:delete_group']['name'])
+
+
