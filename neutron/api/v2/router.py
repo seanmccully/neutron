@@ -33,8 +33,7 @@ LOG = logging.getLogger(__name__)
 
 RESOURCES = {'network': 'networks',
              'subnet': 'subnets',
-             'port': 'ports',
-             'group' : 'groups'}
+             'port': 'ports'}
 SUB_RESOURCES = {}
 COLLECTION_ACTIONS = ['index', 'create']
 MEMBER_ACTIONS = ['show', 'update', 'delete']

@@ -73,10 +73,6 @@ class PolicyNotAuthorized(NotAuthorized):
 class NetworkNotFound(NotFound):
     message = _("Network %(net_id)s could not be found")
 
-
-class GroupNotFound(NotFound):
-    message = _("Group %(group_id)s could not be found")
-
 class SubnetNotFound(NotFound):
     message = _("Subnet %(subnet_id)s could not be found")
 

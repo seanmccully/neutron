@@ -176,8 +176,6 @@ class Network(model_base.BASEV2, HasId, HasTenant):
     admin_state_up = sa.Column(sa.Boolean)
     shared = sa.Column(sa.Boolean)
 
-class Group(model_base.BASEV2, HasId, HasTenant):
-    """Represents a Network Policy Group """
 
-    name = sa.Column(sa.String(255))
-    description = sa.Column(sa.String(255))
+
+

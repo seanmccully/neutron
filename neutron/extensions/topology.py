@@ -16,10 +16,42 @@
 #    under the License.
 
 from abc import abstractmethod
+import abc
 
 from neutron.api import extensions
 from neutron.openstack.common import jsonutils
+from neutron.api.v2 import base
 from neutron import wsgi
+
+from neutron.plugins.common import constants
+from neutron.services.service_base import ServicePluginBase
+from neutron.common import exceptions
+
+
+RESOURCE_ATTRIBUTE_MAP = {
+    'groups' : {
+        'id': {'allow_post': False, 'allow_put': False,
+               'validate': {'type:uuid': None},
+               'is_visible': True,
+               'primary_key': True},
+        'name': {'allow_post': True, 'allow_put': True,
+                 'validate': {'type:string': None},
+                 'default': '', 'is_visible': True},
+        'description': {'allow_post': True, 'allow_put': True,
+                 'validate': {'type:string': None},
+                 'default': '', 'is_visible': True},
+        'tenant_id': {'allow_post': True, 'allow_put': False,
+                      'validate': {'type:string': None},
+                      'required_by_policy': True,
+                      'is_visible': True},
+
+        },
+}
+
+
+class AffinityNotFound(exceptions.NotFound):
+    message = _("Affinity %(affinity_id)s could not be found")
+
 
 class TopologyController(wsgi.Controller):
 
@@ -34,80 +66,80 @@ class TopologyPluginInterface(extensions.PluginInterface):
         pass
 
 
-class Topology(object):
+class TopologyPluginBase():
+    __metaclass__ = abc.ABCMeta
 
-    def __init__(self):
-        pass
+    def get_plugin_name(self):
+        return constants.SDN
 
-    def get_plugin_interface(self):
-        return TopologyPluginInterface
+    def get_plugin_type(self):
+        return constants.SDN
 
-    def get_name(self):
-        return "Neutron Topology API"
+    def get_plugin_description(self):
+        return 'Topology service plugin'
 
-    def get_alias(self):
-        return "TOPOLOGY"
 
-    def get_description(self):
-        return "Create networks using logical topology semantics"
+class Topology(extensions.ExtensionDescriptor):
 
-    def get_namespace(self):
+    @classmethod
+    def get_name(cls):
+        return "Topology Service"
+
+    @classmethod
+    def get_alias(cls):
+        return "sdnaas"
+
+    @classmethod
+    def get_description(cls):
+        return "Extension for Topologies service"
+
+    @classmethod
+    def get_namespace(cls):
         return "http://www.foundry.att.com/api/ext/pie/v1.0"
 
-    def get_updated(self):
-        return "2013-08-06T16:06:00-08:00"
+    @classmethod
+    def get_updated(cls):
+        return "2013-08-07T10:00:00-00:00"
 
-    def get_resources(self):
+    @classmethod
+    def get_resources(cls):
+        my_plurals = [(key, key[:-1]) for key in RESOURCE_ATTRIBUTE_MAP.keys()]
+        attr.PLURALS.update(dict(my_plurals))
         resources = []
-        resource = extensions.ResourceExtension('topology',
-                                                TopologyController())
-        resources.append(resource)
-        return resources
+        plugin = manager.NeutronManager.get_service_plugins()[
+            constants.SDN]
+        for collection_name in RESOURCE_ATTRIBUTE_MAP:
+            resource_name = collection_name[:-1]
+            params = RESOURCE_ATTRIBUTE_MAP[collection_name]
 
-    def get_actions(self):
-        return [extensions.ActionExtension('topology_resources',
-                                           'TOPOLOGY:add_group',
-                                           self._add_group_handler),
-                extensions.ActionExtension('topology_resources',
-                                           'TOPOLOGY:delete_group',
-                                           self._delete_group_handler)]
+            member_actions = {}
 
-    def get_request_extensions(self):
-        request_exts = []
+            controller = base.create_resource(
+                collection_name, resource_name, plugin, params,
+                member_actions=member_actions,
+                allow_pagination=cfg.CONF.allow_pagination,
+                allow_sorting=cfg.CONF.allow_sorting)
 
-        def _group_handler(req, res):
-            #NOTE: This only handles JSON responses.
-            # You can use content type header to test for XML.
-            data = jsonutils.loads(res.body)
-            data['TOPOLOGY:groups'] = req.GET.get('groups')
-            res.body = jsonutils.dumps(data)
-            return res
+            resource = extensions.ResourceExtension(
+                collection_name,
+                controller,
+                path_prefix=constants.COMMON_PREFIXES[constants.SDN],
+                member_actions=member_actions,
+                attr_map=params)
+            resources.append(resource)
 
-        req_ext1 = extensions.RequestExtension('GET',
-                                               '/topology_resources/:(id)',
-                                               _group_handler)
-        request_exts.append(req_ext1)
+    @classmethod
+    def get_plugin_interface(cls):
+        return TopologyPluginBase
 
-        def _policy_handler(req, res):
-            #NOTE: This only handles JSON responses.
-            # You can use content type header to test for XML.
-            data = jsonutils.loads(res.body)
-            data['TOPOLOGY:policies'] = req.GET.get('policies')
-            res.body = jsonutils.dumps(data)
-            return res
+    def update_attributes_map(self, attributes):
+        super(Loadbalancer, self).update_attributes_map(
+            attributes, extension_attrs_map=RESOURCE_ATTRIBUTE_MAP)
 
-        req_ext2 = extensions.RequestExtension('GET', 
-                                               '/topology_resources/:(id)',
-                                               _policy_handler)
-        request_exts.append(req_ext2)
-        return request_exts
-
-    def _add_group_handler(self, input_dict, req, id):
-        return "Group {0} Added.".format(
-            input_dict['TOPOLOGY:add_group']['name'])
-
-    def _delete_group_handler(self, input_dict, req, id):
-        return "Group {0} Deleted.".format(
-            input_dict['TOPOLOGY:delete_group']['name'])
+    def get_extended_resources(self, version):
+        if version == "2.0":
+            return RESOURCE_ATTRIBUTE_MAP
+        else:
+            return {}
 
 
