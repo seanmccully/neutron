@@ -251,7 +251,7 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
     _supported_extension_aliases = ["provider", "router", "ext-gw-mode",
                                     "binding", "quotas", "security-group",
                                     "agent", "extraroute",
-                                    "l3_agent_scheduler",
+                                    "l3_agent_scheduler", "topology",
                                     "dhcp_agent_scheduler"]
 
     @property

@@ -261,7 +261,6 @@ class ExtensionMiddleware(wsgi.Middleware):
     """Extensions middleware for WSGI."""
     def __init__(self, application,
                  ext_mgr=None):
-
         self.ext_mgr = (ext_mgr
                         or ExtensionManager(
                         get_extensions_path()))
@@ -534,6 +533,7 @@ class ExtensionManager(object):
                 LOG.error(_("Extension path '%s' doesn't exist!"), path)
 
     def _load_all_extensions_from_path(self, path):
+
         for f in os.listdir(path):
             try:
                 LOG.info(_('Loading extension file: %s'), f)
@@ -555,11 +555,13 @@ class ExtensionManager(object):
                 LOG.warn(_("Extension file %(f)s wasn't loaded due to "
                            "%(exception)s"), {'f': f, 'exception': exception})
 
+
     def add_extension(self, ext):
         # Do nothing if the extension doesn't check out
         if not self._check_extension(ext):
             return
 
+        
         alias = ext.get_alias()
         LOG.info(_('Loaded extension: %s'), alias)
 

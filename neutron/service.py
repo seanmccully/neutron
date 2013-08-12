@@ -105,6 +105,7 @@ def serve_wsgi(cls):
 
 
 def _run_wsgi(app_name):
+    from IPython import embed;embed()
     app = config.load_paste_app(app_name)
     if not app:
         LOG.error(_('No known API applications configured.'))
@@ -129,7 +130,6 @@ class Service(service.Service):
     def __init__(self, host, binary, topic, manager, report_interval=None,
                  periodic_interval=None, periodic_fuzzy_delay=None,
                  *args, **kwargs):
-
         self.binary = binary
         self.manager_class_name = manager
         manager_class = importutils.import_class(self.manager_class_name)

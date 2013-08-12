@@ -80,6 +80,7 @@ class TopologyPluginBase():
 
 
 class Topology(extensions.ExtensionDescriptor):
+    path_prefix = '/'
 
     @classmethod
     def get_name(cls):
@@ -87,7 +88,7 @@ class Topology(extensions.ExtensionDescriptor):
 
     @classmethod
     def get_alias(cls):
-        return "sdnaas"
+        return "topology"
 
     @classmethod
     def get_description(cls):
