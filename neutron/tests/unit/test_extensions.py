@@ -21,6 +21,7 @@ import routes
 import webob
 import webtest
 
+from neutron import api
 from neutron.api import extensions
 from neutron.common import config
 from neutron.db import db_base_plugin_v2
@@ -32,7 +33,6 @@ from neutron.tests.unit import extension_stubs as ext_stubs
 import neutron.tests.unit.extensions
 from neutron.tests.unit import testlib_api
 from neutron import wsgi
-
 
 LOG = logging.getLogger(__name__)
 
@@ -173,6 +173,12 @@ class ResourceExtensionTest(base.BaseTestCase):
         self.assertEqual(200, response.status_int)
         self.assertEqual(jsonutils.loads(response.body)['collection'],
                          "value")
+
+    def test_full_module_path(self):
+        path = api.__path__[0]
+        ext_manager = extensions.ExtensionManager(path)
+        mod_name = ext_manager._full_module_path(path)
+        self.assertEqual('neutron.api', mod_name)
 
     def test_plugin_prefix_with_parent_resource(self):
         controller = self.DummySvcPlugin()
