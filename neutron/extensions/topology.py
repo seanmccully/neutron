@@ -35,7 +35,7 @@ from neutron.common.exceptions import NotFound
 
 
 RESOURCE_ATTRIBUTE_MAP = {
-    'groups' : {
+    'affinitys' : {
         'id': {'allow_post': False, 'allow_put': False,
                'validate': {'type:uuid': None},
                'is_visible': True,

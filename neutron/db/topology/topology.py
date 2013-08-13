@@ -54,29 +54,29 @@ class TopologyDbMixin(topology.TopologyPluginBase,
                 raise
         return r
 
-    def _get_group(self, context, id):
+    def _get_affinity(self, context, id):
         try:
             group = self._get_by_id(context, Affinity, id)
         except exc.NoResultFound:
             raise topology.AffinityNotFound(affinity=id)
         return group
 
-    def get_group(self, context, id, fields=None):   
+    def get_affinity(self, context, id, fields=None):   
         group = self._get_group(context, id)
-        return self._make_group_dict(group, fields)
+        return self._make_affinity_dict(group, fields)
 
-    def get_groups(self, context, filters=None, fields=None, limit=None,
+    def get_affinitys(self, context, filters=None, fields=None, limit=None,
                     marker=None, sorts=None, page_reverse=False):   
         marker_obj = self._get_marker_obj(context, 'group', limit, marker)
         return self._get_collection(context, Affinity,
-                                    self._make_group_dict,
+                                    self._make_affinity_dict,
                                     filters=filters, fields=fields,
                                     sorts=sorts,
                                     limit=limit,
                                     marker_obj=marker_obj,
                                     page_reverse=page_reverse)
 
-    def create_group(self, context, group):
+    def create_affinity(self, context, group):
         """Handle creation of a group""" 
         # single request processing
         group = group['group']
@@ -89,22 +89,22 @@ class TopologyDbMixin(topology.TopologyPluginBase,
             group = Affinity(**args)
             context.session.add(group)
 
-        return self._make_group_dict(group)
+        return self._make_affinity_dict(group)
 
-    def update_group(self, context, id, group):
+    def update_affinity(self, context, id, group):
         """Handle update of a group"""
         group_dict = group['group']
         with context.session.begin(subtransactions=True):
             group = self._get_group(context, id)
             group.update(group_dict)
-        return self._make_group_dict(group)
+        return self._make_affinity_dict(group)
 
-    def delete_group(self, context, id):
+    def delete_affinity(self, context, id):
         with context.session.begin(subtransactions=True):
             group = self._get_group(context, id)
             context.session.delete(group)
 
-    def _make_group_dict(self, group, fields=None):
+    def _make_affinity_dict(self, group, fields=None):
             res = { 'id': group['id'],
                     'tenant_id': group['tenant_id'],
                     'name' : group['name'],
