@@ -15,7 +15,7 @@ class Affinity(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     description = sa.Column(sa.String(255))
 
 
-class TopologyDbMixin(TopologyPluginBase,
+class TopologyDbMixin(topology.TopologyPluginBase,
                            base_db.CommonDbMixin):
     """Wraps loadbalancer with SQLAlchemy models.
 

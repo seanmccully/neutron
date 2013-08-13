@@ -18,16 +18,20 @@
 from abc import abstractmethod
 import abc
 
+from oslo.config import cfg
 from neutron import manager
 from neutron.api.v2 import attributes
-from neutron.api import extensions
+
+from neutron.api.extensions import ExtensionDescriptor
+from neutron.api.extensions import ResourceExtension
+from neutron.api.extensions import PluginInterface
 from neutron.openstack.common import jsonutils
-from neutron.api.v2 import base
-from neutron import wsgi
+from neutron.api.v2.base import create_resource
+from neutron.wsgi import Controller
 
 from neutron.plugins.common import constants
 from neutron.services.service_base import ServicePluginBase
-from neutron.common import exceptions
+from neutron.common.exceptions import NotFound
 
 
 RESOURCE_ATTRIBUTE_MAP = {
@@ -51,17 +55,17 @@ RESOURCE_ATTRIBUTE_MAP = {
 }
 
 
-class AffinityNotFound(exceptions.NotFound):
+class AffinityNotFound(NotFound):
     message = _("Affinity %(affinity_id)s could not be found")
 
 
-class TopologyController(wsgi.Controller):
+class TopologyController(Controller):
 
     def index(self, request):
         return "All your controller are belong to us"
 
 
-class TopologyPluginInterface(extensions.PluginInterface):
+class TopologyPluginInterface(PluginInterface):
 
     @abstractmethod
     def create_group(self):
@@ -81,7 +85,7 @@ class TopologyPluginBase(object):
         return 'Topology service plugin'
 
 
-class Topology(extensions.ExtensionDescriptor):
+class Topology(ExtensionDescriptor):
     path_prefix = '/'
 
     @classmethod
@@ -104,34 +108,34 @@ class Topology(extensions.ExtensionDescriptor):
     def get_updated(cls):
         return "2013-08-07T10:00:00-00:00"
 
-    """
+
+
     @classmethod
     def get_resources(cls):
+        """Returns Ext Resources."""
         my_plurals = [(key, key[:-1]) for key in RESOURCE_ATTRIBUTE_MAP.keys()]
         attributes.PLURALS.update(dict(my_plurals))
-        resources = []
-        #plugin = manager.NeutronManager.get_service_plugins()[
-        #    constants.SDN]
-        for collection_name in RESOURCE_ATTRIBUTE_MAP:
-            resource_name = collection_name[:-1]
-            params = RESOURCE_ATTRIBUTE_MAP[collection_name]
+        exts = []
+        plugin = manager.NeutronManager.get_plugin()
+        for resource_name in RESOURCE_ATTRIBUTE_MAP:
+            collection_name = resource_name
+            params = RESOURCE_ATTRIBUTE_MAP.get(collection_name, dict())
 
             member_actions = {}
 
-            controller = base.create_resource(
+            controller = create_resource(
                 collection_name, resource_name, plugin, params,
                 member_actions=member_actions,
                 allow_pagination=cfg.CONF.allow_pagination,
                 allow_sorting=cfg.CONF.allow_sorting)
 
-            resource = extensions.ResourceExtension(
-                collection_name,
-                controller,
-                path_prefix=constants.COMMON_PREFIXES[constants.SDN],
-                member_actions=member_actions,
-                attr_map=params)
-            resources.append(resource)
-    """
+            ex = ResourceExtension(collection_name,
+                                              controller,
+                                              member_actions=member_actions,
+                                              attr_map=params)
+            exts.append(ex)
+
+        return exts
 
     @classmethod
     def get_plugin_interface(cls):
