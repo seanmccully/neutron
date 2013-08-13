@@ -18,6 +18,8 @@
 from abc import abstractmethod
 import abc
 
+from neutron import manager
+from neutron.api.v2 import attributes
 from neutron.api import extensions
 from neutron.openstack.common import jsonutils
 from neutron.api.v2 import base
@@ -66,7 +68,7 @@ class TopologyPluginInterface(extensions.PluginInterface):
         pass
 
 
-class TopologyPluginBase():
+class TopologyPluginBase(object):
     __metaclass__ = abc.ABCMeta
 
     def get_plugin_name(self):
@@ -102,13 +104,14 @@ class Topology(extensions.ExtensionDescriptor):
     def get_updated(cls):
         return "2013-08-07T10:00:00-00:00"
 
+    """
     @classmethod
     def get_resources(cls):
         my_plurals = [(key, key[:-1]) for key in RESOURCE_ATTRIBUTE_MAP.keys()]
-        attr.PLURALS.update(dict(my_plurals))
+        attributes.PLURALS.update(dict(my_plurals))
         resources = []
-        plugin = manager.NeutronManager.get_service_plugins()[
-            constants.SDN]
+        #plugin = manager.NeutronManager.get_service_plugins()[
+        #    constants.SDN]
         for collection_name in RESOURCE_ATTRIBUTE_MAP:
             resource_name = collection_name[:-1]
             params = RESOURCE_ATTRIBUTE_MAP[collection_name]
@@ -128,13 +131,14 @@ class Topology(extensions.ExtensionDescriptor):
                 member_actions=member_actions,
                 attr_map=params)
             resources.append(resource)
+    """
 
     @classmethod
     def get_plugin_interface(cls):
         return TopologyPluginBase
 
     def update_attributes_map(self, attributes):
-        super(Loadbalancer, self).update_attributes_map(
+        super(Topology, self).update_attributes_map(
             attributes, extension_attrs_map=RESOURCE_ATTRIBUTE_MAP)
 
     def get_extended_resources(self, version):

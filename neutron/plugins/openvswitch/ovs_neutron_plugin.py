@@ -44,6 +44,7 @@ from neutron.db import l3_rpc_base
 from neutron.db import portbindings_db
 from neutron.db import quota_db  # noqa
 from neutron.db import securitygroups_rpc_base as sg_db_rpc
+from neutron.db.topology import topology
 from neutron.extensions import portbindings
 from neutron.extensions import providernet as provider
 from neutron.openstack.common import importutils
@@ -222,7 +223,8 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                          sg_db_rpc.SecurityGroupServerRpcMixin,
                          agentschedulers_db.L3AgentSchedulerDbMixin,
                          agentschedulers_db.DhcpAgentSchedulerDbMixin,
-                         portbindings_db.PortBindingMixin):
+                         portbindings_db.PortBindingMixin,
+                         topology.TopologyDbMixin):
 
     """Implement the Neutron abstractions using Open vSwitch.
 
