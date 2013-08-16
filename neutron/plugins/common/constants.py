@@ -44,6 +44,7 @@ COMMON_PREFIXES = {
     FIREWALL: "/fw",
     VPN: "/vpn",
     SDN: "/sdn",
+    METERING: "/metering",
     }
 
 # Service operation status constants

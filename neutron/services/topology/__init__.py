@@ -1,5 +1,5 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
-
+#
 # Copyright 2013 Sean McCully
 # All Rights Reserved.
 #
@@ -14,3 +14,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
+from neutron.db.topology import TopologyDbMixin
+
+class TopologyCallbacks(TopologyDbMixin):
+
+    RPC_API_VERSION = '1.0'
+
+    def __init__(self, plugin):
+        self.plugin = plugin
+
+    def create_rpc_dispatcher(self):
+        return p_rpc.PluginRpcDispatcher([self])
+
+
+
