@@ -228,3 +228,7 @@ class TopologyDbMixin(topology.TopologyPluginBase,
         return self._fields(res, fields)
 
 
+    def create_port(self, context, port):
+        port_dict = super(TopologyDbMixin, self).create_port(self, context, port)
+
+        return port_dict
