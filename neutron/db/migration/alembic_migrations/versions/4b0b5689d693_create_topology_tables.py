@@ -36,7 +36,7 @@ migration_for_plugins = [
 from alembic import op
 import sqlalchemy as sa
 
-
+from neutron.db import topology
 from neutron.db import migration
 
 
@@ -67,6 +67,13 @@ def upgrade(active_plugins=None, options=None):
         sa.ForeignKeyConstraint(['affinity_id'], ['affinitys.id'], name='affinitys_affinitypolicys_fk'),
         sa.PrimaryKeyConstraint('affinity_id', 'tenant_id', 'proto', name='affinitypolicys_pk'))
 
+    op.create_table(
+        'affinitymappers',
+        sa.Column('affinity_id', sa.String(36), nullable=False, primary_key=True),
+        sa.Column('map_type_id', sa.String(36), nullable=False),
+        sa.Column('map_types', sa.Enum(*topology.AFFINITY_MAP_TYPES), nullable=False),
+        sa.ForeignKeyConstraint(['affinity_id'], ['affinitys.id'], name='affinitys_affinitymappers_fk'))
+
 
 
 
@@ -76,3 +83,4 @@ def downgrade(active_plugins=None, options=None):
 
     op.drop_table('affinitypolicys')
     op.drop_table('affinitys')
+    op.drop_table('affinitymappers')

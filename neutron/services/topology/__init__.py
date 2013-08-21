@@ -16,6 +16,7 @@
 #    under the License.
 
 from neutron.db.topology import TopologyDbMixin
+from neutron.common import rpc as p_rpc
 
 class TopologyCallbacks(TopologyDbMixin):
 
@@ -26,6 +27,4 @@ class TopologyCallbacks(TopologyDbMixin):
 
     def create_rpc_dispatcher(self):
         return p_rpc.PluginRpcDispatcher([self])
-
-
 

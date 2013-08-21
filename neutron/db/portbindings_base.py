@@ -21,7 +21,6 @@ from neutron.db import db_base_plugin_v2
 
 
 class PortBindingBaseMixin(object):
-    base_binding_dict = None
 
     def _process_portbindings_create_and_update(self, context, port_data,
                                                 port):

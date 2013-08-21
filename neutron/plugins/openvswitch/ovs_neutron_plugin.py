@@ -270,6 +270,7 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
             portbindings.CAPABILITIES: {
                 portbindings.CAP_PORT_FILTER:
                 'security-group' in self.supported_extension_aliases}}
+
         ovs_db_v2.initialize()
         self._parse_network_vlan_ranges()
         ovs_db_v2.sync_vlan_allocations(self.network_vlan_ranges)
@@ -543,6 +544,8 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
             self._process_portbindings_create_and_update(context,
                                                          port_data, port)
             self._process_port_create_security_group(context, port, sgids)
+            if 'affinity_id' in port_data:
+                self._process_affinity_port_map(context, port_data['affinity_id'], port)
         self.notify_security_groups_member_updated(context, port)
         return port
 

@@ -21,6 +21,16 @@ from neutron.extensions import topology
 from neutron.db import db_base_plugin_v2 as base_db
 from neutron.openstack.common import uuidutils
 
+AFFINITY_MAP_TYPES = ("PORTS", "ROUTERS", "NETWORKS", )
+AFFINITY_MAP_PORTS = 0
+AFFINITY_MAP_ROUTERS = 1
+AFFINITY_MAP_NETWORKS = 2
+
+def get_affinity_map_label(idx):
+    try:
+        return AFFINITY_MAP_TYPES[idx]
+    except IndexError:
+        return None
 
 class Affinity(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant, models_v2.HasStatusDescription):
     """Represents a Network Policy Group """
@@ -41,6 +51,15 @@ class AffinityPolicy(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant, mo
     affinity= sa.orm.relationship(Affinity, backref='policies',
                                   lazy='joined',
                                    cascade="delete")
+
+
+class AffinityMapper(model_base.BASEV2):
+
+    affinity_id = sa.Column(sa.String(36), 
+                            sa.ForeignKey('affinitys.id', ondelete="CASCADE"),
+                            nullable=False, primary_key=True)
+    map_types = sa.Column(sa.Enum(*AFFINITY_MAP_TYPES), nullable=False)
+    map_type_id = sa.Column(sa.String(36))
 
 
 class TopologyDbMixin(topology.TopologyPluginBase,
@@ -228,7 +247,12 @@ class TopologyDbMixin(topology.TopologyPluginBase,
         return self._fields(res, fields)
 
 
-    def create_port(self, context, port):
-        port_dict = super(TopologyDbMixin, self).create_port(self, context, port)
+    def _process_affinity_port_map(self, context, affinity_id, port):
+        affinity_map = AffinityMapper(map_type_id=port['id'],
+                                      affinity_id=affinity_id,
+                                      map_types=\
+                                    get_affinity_map_label(AFFINITY_MAP_PORTS))
+        context.session.add(affinity_map)
 
-        return port_dict
+
+

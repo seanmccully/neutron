@@ -82,7 +82,17 @@ RESOURCE_ATTRIBUTE_MAP = {
         'status_description': {'allow_post': True, 'allow_put': True,
                  'validate': {'type:string': None},
                  'default': '', 'is_visible': True},
-        }
+    }
+}
+
+
+EXTENDED_ATTRIBUTES_2_0 = {
+    'ports': {
+        'affinity_id' : {'allow_post': True, 'allow_put': False,
+                        'validate' : {'type:uuid': None},
+                        'enforce_policy': True,
+                        'is_visible': True},
+    }
 }
 
 
@@ -179,7 +189,7 @@ class Topology(ExtensionDescriptor):
 
     def get_extended_resources(self, version):
         if version == "2.0":
-            return RESOURCE_ATTRIBUTE_MAP
+            return EXTENDED_ATTRIBUTES_2_0
         else:
             return {}
 
