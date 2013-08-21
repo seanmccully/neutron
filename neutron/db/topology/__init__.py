@@ -247,12 +247,13 @@ class TopologyDbMixin(topology.TopologyPluginBase,
         return self._fields(res, fields)
 
 
-    def _process_affinity_port_map(self, context, affinity_id, port):
-        affinity_map = AffinityMapper(map_type_id=port['id'],
+    def _add_affinity_map(self, context, affinity_id, map_type_id, map_type):
+        affinity_map = AffinityMapper(map_type_id=map_type_id,
                                       affinity_id=affinity_id,
-                                      map_types=\
-                                    get_affinity_map_label(AFFINITY_MAP_PORTS))
-        context.session.add(affinity_map)
+                                      map_types=map_type)
+        return context.session.add(affinity_map)
 
 
-
+    def _create_affinity_map(self, context, affinity_id, map_type_id, map_type):
+        return self._add_affinity_map(context, affinity_id, map_type_id,
+                                     get_affinity_map_label(map_type))

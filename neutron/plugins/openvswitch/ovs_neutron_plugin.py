@@ -477,7 +477,14 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                                           physical_network, segmentation_id)
 
             self._process_l3_create(context, net, network['network'])
+
             self._extend_network_dict_provider(context, net)
+            if 'affinity_id' in network['network']:
+                self._create_affinity_map(context,
+                                          network['network']['affinity_id'],
+                                          net['id'],
+                                          topology.AFFINITY_MAP_NETWORKS)
+
             # note - exception will rollback entire transaction
         LOG.debug(_("Created network: %s"), net['id'])
         return net
@@ -545,7 +552,10 @@ class OVSNeutronPluginV2(db_base_plugin_v2.NeutronDbPluginV2,
                                                          port_data, port)
             self._process_port_create_security_group(context, port, sgids)
             if 'affinity_id' in port_data:
-                self._process_affinity_port_map(context, port_data['affinity_id'], port)
+                self._create_affinity_map(context, port_data['affinity_id'],
+                                          port['id'],
+                                          topology.AFFINITY_MAP_PORTS)
+
         self.notify_security_groups_member_updated(context, port)
         return port
 

@@ -92,7 +92,13 @@ EXTENDED_ATTRIBUTES_2_0 = {
                         'validate' : {'type:uuid': None},
                         'enforce_policy': True,
                         'is_visible': True},
-    }
+    },
+    'networks': {
+        'affinity_id' : {'allow_post': True, 'allow_put': False,
+                        'validate' : {'type:uuid': None},
+                        'enforce_policy': True,
+                        'is_visible': True},
+    },
 }
 
 
