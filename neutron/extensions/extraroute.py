@@ -18,6 +18,7 @@
 
 from neutron.api.v2 import attributes as attr
 from neutron.common import exceptions as qexception
+from neutron.extensions.l3 import RouterPluginBase
 
 
 # Extra Routes Exceptions
@@ -74,3 +75,7 @@ class Extraroute():
             return EXTENDED_ATTRIBUTES_2_0
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return RouterPluginBase

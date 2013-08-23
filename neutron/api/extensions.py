@@ -601,10 +601,6 @@ class PluginAwareExtensionManager(ExtensionManager):
         return supports_extension
 
     def _plugins_implement_interface(self, extension):
-        #This check should be deprecated, but leaving until its not needed
-        if(not hasattr(extension, "get_plugin_interface") or
-           extension.get_plugin_interface() is None):
-            return True
         for plugin in self.plugins.values():
             if isinstance(plugin, extension.get_plugin_interface()):
                 return True

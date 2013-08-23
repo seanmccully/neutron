@@ -116,6 +116,10 @@ class Dhcpagentscheduler(extensions.ExtensionDescriptor):
     def get_extended_resources(self, version):
         return {}
 
+    @classmethod
+    def get_plugin_interface(cls):
+        return DhcpAgentSchedulerPluginBase
+
 
 class InvalidDHCPAgent(agent.AgentNotFound):
     message = _("Agent %(id)s is not a valid DHCP Agent or has been disabled")

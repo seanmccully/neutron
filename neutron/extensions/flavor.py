@@ -67,3 +67,7 @@ class Flavor(extensions.ExtensionDescriptor):
             return FLAVOR_ATTRIBUTE
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return DhcpAgentSchedulerPluginBase

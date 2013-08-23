@@ -112,6 +112,10 @@ class Lbaas_agentscheduler(extensions.ExtensionDescriptor):
     def get_extended_resources(self, version):
         return {}
 
+    @classmethod
+    def get_plugin_interface(cls):
+        return LbaasAgentSchedulerPluginBase
+
 
 class NoEligibleLbaasAgent(agent.AgentNotFound):
     message = _("No eligible loadbalancer agent found "

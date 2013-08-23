@@ -22,6 +22,7 @@ from neutron.api import extensions
 from neutron.api.v2 import attributes as attrs
 from neutron.common import exceptions as qexception
 from neutron.extensions import l3
+from neutron.extensions.l3 import RouterPluginBase
 
 
 class RouterDNatDisabled(qexception.BadRequest):
@@ -74,3 +75,7 @@ class L3_ext_gw_mode(extensions.ExtensionDescriptor):
             return dict(EXTENDED_ATTRIBUTES_2_0.items())
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return RouterPluginBase

@@ -91,3 +91,7 @@ class Servicetype(extensions.ExtensionDescriptor):
             return RESOURCE_ATTRIBUTE_MAP
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return object

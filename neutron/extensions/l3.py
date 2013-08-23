@@ -230,6 +230,10 @@ class L3(extensions.ExtensionDescriptor):
         else:
             return {}
 
+    @classmethod
+    def get_plugin_interface(cls):
+        return RouterPluginBase
+
 
 class RouterPluginBase(object):
 

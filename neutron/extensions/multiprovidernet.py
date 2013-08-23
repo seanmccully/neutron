@@ -114,3 +114,7 @@ class Multiprovidernet(extensions.ExtensionDescriptor):
             return EXTENDED_ATTRIBUTES_2_0
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return object
