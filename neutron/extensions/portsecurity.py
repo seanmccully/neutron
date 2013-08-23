@@ -19,6 +19,7 @@
 
 from neutron.api.v2 import attributes
 from neutron.common import exceptions as qexception
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 
 
 class PortSecurityPortHasSecurityGroup(qexception.InUse):
@@ -84,4 +85,4 @@ class Portsecurity(object):
 
     @classmethod
     def get_plugin_interface(cls):
-        return object
+        return NeutronPluginBaseV2

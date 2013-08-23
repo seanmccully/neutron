@@ -17,6 +17,7 @@
 
 from neutron.api import extensions
 from neutron.api.v2 import attributes
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 
 
 # The service will return the vif type for the specific port.
@@ -110,4 +111,4 @@ class Portbindings(extensions.ExtensionDescriptor):
 
     @classmethod
     def get_plugin_interface(cls):
-        return object
+        return NeutronPluginBaseV2

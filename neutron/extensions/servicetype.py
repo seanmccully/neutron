@@ -23,6 +23,7 @@ from neutron.api.v2 import attributes
 from neutron.api.v2 import base
 from neutron.db import servicetype_db
 from neutron.openstack.common import log as logging
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 
 LOG = logging.getLogger(__name__)
 
@@ -94,4 +95,4 @@ class Servicetype(extensions.ExtensionDescriptor):
 
     @classmethod
     def get_plugin_interface(cls):
-        return object
+        return NeutronPluginBaseV2

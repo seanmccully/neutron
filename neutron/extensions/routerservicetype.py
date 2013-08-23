@@ -16,6 +16,7 @@
 #
 # @author: Kaiwei Fan, VMware, Inc
 
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 
 SERVICE_TYPE_ID = 'service_type_id'
 EXTENDED_ATTRIBUTES_2_0 = {
@@ -58,4 +59,4 @@ class Routerservicetype(object):
         
     @classmethod
     def get_plugin_interface(cls):
-        return object
+        return NeutronPluginBaseV2

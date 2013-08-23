@@ -29,6 +29,7 @@ from neutron.manager import NeutronManager
 from neutron.openstack.common import importutils
 from neutron import quota
 from neutron import wsgi
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 
 
 RESOURCE_NAME = 'quota'
@@ -155,4 +156,4 @@ class Quotasv2(extensions.ExtensionDescriptor):
 
     @classmethod
     def get_plugin_interface(cls):
-        return object
+        return NeutronPluginBaseV2

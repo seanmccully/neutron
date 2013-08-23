@@ -18,6 +18,7 @@
 from neutron.api import extensions
 from neutron.api.v2 import attributes
 from neutron.common import exceptions as q_exc
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 
 
 NETWORK_TYPE = 'provider:network_type'
@@ -98,4 +99,4 @@ class Providernet(extensions.ExtensionDescriptor):
 
     @classmethod
     def get_plugin_interface(cls):
-        return object
+        return NeutronPluginBaseV2

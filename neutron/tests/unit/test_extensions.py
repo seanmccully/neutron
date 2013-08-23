@@ -30,6 +30,7 @@ from neutron.openstack.common import log as logging
 from neutron.plugins.common import constants
 from neutron.tests import base
 from neutron.tests.unit import extension_stubs as ext_stubs
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 import neutron.tests.unit.extensions
 from neutron.tests.unit import testlib_api
 from neutron import wsgi
@@ -527,7 +528,7 @@ class PluginAwareExtensionManagerTest(base.BaseTestCase):
             This will work with any plugin implementing NeutronPluginBase
             """
             def get_plugin_interface(self):
-                return None
+                return NeutronPluginBaseV2
 
         stub_plugin = ext_stubs.StubPlugin(supported_extensions=["e1"])
         plugin_info = {constants.CORE: stub_plugin}
@@ -539,7 +540,7 @@ class PluginAwareExtensionManagerTest(base.BaseTestCase):
     def test_extension_loaded_for_non_core_plugin(self):
         class NonCorePluginExtenstion(ext_stubs.StubExtension):
             def get_plugin_interface(self):
-                return None
+                return NeutronPluginBaseV2
 
         stub_plugin = ext_stubs.StubPlugin(supported_extensions=["e1"])
         plugin_info = {constants.DUMMY: stub_plugin}
