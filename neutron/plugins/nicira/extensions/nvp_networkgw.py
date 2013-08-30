@@ -21,6 +21,7 @@ from abc import abstractmethod
 from oslo.config import cfg
 
 from neutron.api import extensions
+from neutron.api.extensions import ExtensionDescriptor
 from neutron.api.v2 import attributes
 from neutron.api.v2 import base
 from neutron import manager
@@ -98,7 +99,7 @@ cfg.CONF.register_opts(nw_gw_quota_opts, 'QUOTAS')
 attributes.validators['type:device_list'] = _validate_device_list
 
 
-class Nvp_networkgw(object):
+class Nvp_networkgw(ExtensionDescriptor):
     """API extension for Layer-2 Gateway support.
 
     The Layer-2 gateway feature allows for connecting neutron networks
@@ -155,6 +156,10 @@ class Nvp_networkgw(object):
             return RESOURCE_ATTRIBUTE_MAP
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return NetworkGatewayPluginBase
 
 
 class NetworkGatewayPluginBase(object):

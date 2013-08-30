@@ -18,6 +18,7 @@
 
 import webob.exc
 
+from neutron.api.extensions import ExtensionDescriptor
 from neutron.api.v2 import attributes as attr
 from neutron.common import exceptions as nexception
 
@@ -92,7 +93,7 @@ EXTENDED_ATTRIBUTES_2_0 = {
 }
 
 
-class Allowedaddresspairs(object):
+class Allowedaddresspairs(ExtensionDescriptor):
     """Extension class supporting allowed address pairs."""
 
     @classmethod

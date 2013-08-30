@@ -44,7 +44,7 @@ class MacLearningState(model_base.BASEV2):
                             uselist=False, cascade='delete'))
 
 
-class MacLearningDbMixin(object):
+class MacLearningDbMixin(db_base_plugin_v2.CommonDbMixin):
     """Mixin class for mac learning."""
 
     def _make_mac_learning_state_dict(self, port, fields=None):

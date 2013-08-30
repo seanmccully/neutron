@@ -148,6 +148,10 @@ class L3agentscheduler(extensions.ExtensionDescriptor):
     def get_extended_resources(self, version):
         return {}
 
+    @classmethod
+    def get_plugin_interface(cls):
+        return L3AgentSchedulerPluginBase
+
 
 class InvalidL3Agent(agent.AgentNotFound):
     message = _("Agent %(id)s is not a L3 Agent or has been disabled")

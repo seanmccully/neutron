@@ -18,12 +18,14 @@
 # @author: Kaiwei Fan, VMware, Inc
 #
 
+from abc import ABCMeta
 from abc import abstractmethod
 
 from neutron.api import extensions
 from neutron.api.v2 import base
 from neutron import manager
 from neutron import quota
+from neutron.services.service_base import ServicePluginBase
 
 
 # Attribute Map
@@ -98,8 +100,13 @@ class Extensionattribute(extensions.ExtensionDescriptor):
         else:
             return {}
 
+    @classmethod
+    def get_plugin_interface(cls):
+        return ExtensionObjectTestPluginBase
 
-class ExtensionObjectTestPluginBase(object):
+
+class ExtensionObjectTestPluginBase(ServicePluginBase):
+    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_ext_test_resource(self, context, router):

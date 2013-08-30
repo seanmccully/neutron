@@ -21,9 +21,11 @@ import routes
 import webob
 import webtest
 
+from neutron import api
 from neutron.api import extensions
 from neutron.common import config
 from neutron.db import db_base_plugin_v2
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
 from neutron.openstack.common import jsonutils
 from neutron.openstack.common import log as logging
 from neutron.plugins.common import constants
@@ -32,7 +34,6 @@ from neutron.tests.unit import extension_stubs as ext_stubs
 import neutron.tests.unit.extensions
 from neutron.tests.unit import testlib_api
 from neutron import wsgi
-
 
 LOG = logging.getLogger(__name__)
 
@@ -173,6 +174,12 @@ class ResourceExtensionTest(base.BaseTestCase):
         self.assertEqual(200, response.status_int)
         self.assertEqual(jsonutils.loads(response.body)['collection'],
                          "value")
+
+    def test_full_module_path(self):
+        path = api.__path__[0]
+        ext_manager = extensions.ExtensionManager(path)
+        mod_name = ext_manager._full_module_path(path)
+        self.assertEqual('neutron.api', mod_name)
 
     def test_plugin_prefix_with_parent_resource(self):
         controller = self.DummySvcPlugin()
@@ -521,7 +528,7 @@ class PluginAwareExtensionManagerTest(base.BaseTestCase):
             This will work with any plugin implementing NeutronPluginBase
             """
             def get_plugin_interface(self):
-                return None
+                return NeutronPluginBaseV2
 
         stub_plugin = ext_stubs.StubPlugin(supported_extensions=["e1"])
         plugin_info = {constants.CORE: stub_plugin}
@@ -533,7 +540,7 @@ class PluginAwareExtensionManagerTest(base.BaseTestCase):
     def test_extension_loaded_for_non_core_plugin(self):
         class NonCorePluginExtenstion(ext_stubs.StubExtension):
             def get_plugin_interface(self):
-                return None
+                return NeutronPluginBaseV2
 
         stub_plugin = ext_stubs.StubPlugin(supported_extensions=["e1"])
         plugin_info = {constants.DUMMY: stub_plugin}

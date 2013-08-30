@@ -16,9 +16,12 @@
 #
 # @author: Aaron Rosen, Nicira, Inc
 
+import abc
 
 from neutron.api.v2 import attributes
 from neutron.common import exceptions as qexception
+from neutron.plugins.common import constants
+from neutron.services.service_base import ServicePluginBase
 
 
 class PortSecurityPortHasSecurityGroup(qexception.InUse):
@@ -81,3 +84,20 @@ class Portsecurity(object):
             return EXTENDED_ATTRIBUTES_2_0
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return PortSecurityPluginBase
+
+
+class PortSecurityPluginBase(ServicePluginBase):
+    __metaclass__ = abc.ABCMeta
+
+    def get_plugin_name(self):
+        return constants.CORE
+
+    def get_plugin_type(self):
+        return constants.CORE
+
+    def get_plugin_description(self):
+        return 'Port Security Plugin'

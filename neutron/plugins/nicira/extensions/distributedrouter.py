@@ -15,6 +15,7 @@
 #    under the License.
 #
 
+from neutron.api.extensions import ExtensionDescriptor
 from neutron.api.v2 import attributes
 
 
@@ -35,7 +36,7 @@ EXTENDED_ATTRIBUTES_2_0 = {
 }
 
 
-class Distributedrouter(object):
+class Distributedrouter(ExtensionDescriptor):
     """Extension class supporting distributed router."""
 
     @classmethod

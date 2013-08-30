@@ -16,6 +16,7 @@
 #
 # @author: Kaiwei Fan, VMware, Inc
 
+from neutron.api.extensions import ExtensionDescriptor
 
 SERVICE_TYPE_ID = 'service_type_id'
 EXTENDED_ATTRIBUTES_2_0 = {
@@ -27,7 +28,7 @@ EXTENDED_ATTRIBUTES_2_0 = {
 }
 
 
-class Routerservicetype(object):
+class Routerservicetype(ExtensionDescriptor):
     """Extension class supporting router service type."""
 
     @classmethod

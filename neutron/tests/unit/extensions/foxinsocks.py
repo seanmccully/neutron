@@ -40,9 +40,6 @@ class Foxinsocks(object):
     def __init__(self):
         pass
 
-    def get_plugin_interface(self):
-        return FoxInSocksPluginInterface
-
     def get_name(self):
         return "Fox In Socks"
 
@@ -108,3 +105,7 @@ class Foxinsocks(object):
     def _delete_tweedle_handler(self, input_dict, req, id):
         return "Tweedle {0} Deleted.".format(
             input_dict['FOXNSOX:delete_tweedle']['name'])
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return FoxInSocksPluginInterface

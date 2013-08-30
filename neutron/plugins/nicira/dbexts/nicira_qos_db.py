@@ -75,7 +75,7 @@ class NetworkQueueMapping(model_base.BASEV2):
                             cascade='delete', lazy='joined'))
 
 
-class NVPQoSDbMixin(ext_qos.QueuePluginBase):
+class NVPQoSDbMixin(ext_qos.QueuePluginBase, db_base_plugin_v2.CommonDbMixin):
     """Mixin class to add queues."""
 
     def create_qos_queue(self, context, qos_queue):

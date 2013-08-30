@@ -66,7 +66,7 @@ class QuotaExtensionTestCase(testlib_api.WebTestCase):
             'quota_items',
             ['network', 'subnet', 'port', 'extra1'],
             group='QUOTAS')
-        quota.QUOTAS = quota.QuotaEngine()
+
         quota.register_resources_from_config()
         self._plugin_patcher = mock.patch(TARGET_PLUGIN, autospec=True)
         self.plugin = self._plugin_patcher.start()

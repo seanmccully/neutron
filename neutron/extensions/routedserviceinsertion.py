@@ -17,6 +17,9 @@
 # @author: Kaiwei Fan, VMware, Inc
 
 
+from neutron.api.extensions import ExtensionDescriptor
+
+
 ROUTER_ID = 'router_id'
 EXTENDED_ATTRIBUTES_2_0 = {
     'vips': {
@@ -43,7 +46,7 @@ EXTENDED_ATTRIBUTES_2_0 = {
 }
 
 
-class Routedserviceinsertion(object):
+class Routedserviceinsertion(ExtensionDescriptor):
     """Extension class supporting routed service type."""
 
     @classmethod

@@ -15,7 +15,7 @@
 #    under the License.
 #
 
-
+from neutron.api.extensions import ExtensionDescriptor
 from neutron.api.v2 import attributes
 
 
@@ -30,7 +30,7 @@ EXTENDED_ATTRIBUTES_2_0 = {
 }
 
 
-class Maclearning(object):
+class Maclearning(ExtensionDescriptor):
     """Extension class supporting port mac learning."""
 
     @classmethod

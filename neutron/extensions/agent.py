@@ -95,6 +95,10 @@ class Agent(object):
         return "2013-02-03T10:00:00-00:00"
 
     @classmethod
+    def get_plugin_interface(cls):
+        return AgentPluginBase
+
+    @classmethod
     def get_resources(cls):
         """Returns Ext Resources."""
         my_plurals = [(key, key[:-1]) for key in RESOURCE_ATTRIBUTE_MAP.keys()]

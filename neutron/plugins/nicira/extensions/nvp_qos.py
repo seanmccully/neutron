@@ -21,6 +21,7 @@
 from abc import abstractmethod
 
 from neutron.api import extensions
+from neutron.api.extensions import ExtensionDescriptor
 from neutron.api.v2 import attributes as attr
 from neutron.api.v2 import base
 from neutron.common import exceptions as qexception
@@ -157,7 +158,7 @@ EXTENDED_ATTRIBUTES_2_0 = {
 }
 
 
-class Nvp_qos(object):
+class Nvp_qos(ExtensionDescriptor):
     """Port Queue extension."""
 
     @classmethod
@@ -204,6 +205,10 @@ class Nvp_qos(object):
                         RESOURCE_ATTRIBUTE_MAP.items())
         else:
             return {}
+
+    @classmethod
+    def get_plugin_interface(cls):
+        return QueuePluginBase
 
 
 class QueuePluginBase(object):

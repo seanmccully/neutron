@@ -31,6 +31,8 @@ from neutron.plugins.common import constants
 from neutron.plugins.openvswitch import ovs_neutron_plugin
 from neutron.tests import base
 from neutron.tests.unit.extensions import extendedattribute as extattr
+from neutron.tests.unit.extensions.extensionattribute import (
+    ExtensionObjectTestPluginBase)
 from neutron.tests.unit import test_api_v2
 from neutron.tests.unit import testlib_api
 from neutron import wsgi
@@ -41,7 +43,8 @@ extensions_path = ':'.join(neutron.tests.unit.extensions.__path__)
 
 
 class ExtensionExtendedAttributeTestPlugin(
-    ovs_neutron_plugin.OVSNeutronPluginV2):
+    ovs_neutron_plugin.OVSNeutronPluginV2,
+    ExtensionObjectTestPluginBase):
 
     supported_extension_aliases = [
         'ext-obj-test', "extended-ext-attr"

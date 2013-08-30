@@ -138,6 +138,9 @@ class L3NatExtensionTestCase(testlib_api.WebTestCase):
         res = self.api.post(_get_path('routers', fmt=self.fmt),
                             self.serialize(data),
                             content_type='application/%s' % self.fmt)
+        data['router'].update({'flavor:router': mock.ANY,
+                               'distributed': mock.ANY,
+                               'provider': mock.ANY})
         instance.create_router.assert_called_with(mock.ANY,
                                                   router=data)
         self.assertEqual(res.status_int, exc.HTTPCreated.code)
@@ -967,7 +970,8 @@ class L3NatTestCaseBase(L3NatTestCaseMixin):
         with self.router() as r:
             self._add_external_gateway_to_router(
                 r['router']['id'],
-                "foobar", expected_code=exc.HTTPNotFound.code)
+                "ccb11760-0e99-11e3-bb3f-089e01b78faa",
+                expected_code=exc.HTTPNotFound.code)
 
     def test_router_add_gateway_net_not_external_returns_400(self):
         with self.router() as r:

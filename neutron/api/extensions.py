@@ -17,7 +17,6 @@
 #    under the License.
 
 from abc import ABCMeta
-import imp
 import os
 
 from oslo.config import cfg
@@ -29,6 +28,8 @@ from neutron.api.v2 import attributes
 from neutron.common import exceptions
 import neutron.extensions
 from neutron.manager import NeutronManager
+from neutron.neutron_plugin_base_v2 import NeutronPluginBaseV2
+from neutron.openstack.common.importutils import import_module
 from neutron.openstack.common import log as logging
 from neutron import wsgi
 
@@ -147,7 +148,7 @@ class ExtensionDescriptor(object):
         The abstract class should inherit from extesnions.PluginInterface,
         Methods in this abstract class  should be decorated as abstractmethod
         """
-        return None
+        return NeutronPluginBaseV2
 
     def update_attributes_map(self, extended_attributes,
                               extension_attrs_map=None):
@@ -538,13 +539,17 @@ class ExtensionManager(object):
                 LOG.error(_("Extension path '%s' doesn't exist!"), path)
 
     def _load_all_extensions_from_path(self, path):
+        full_module = self._full_module_path(path)
         for f in os.listdir(path):
             try:
                 LOG.info(_('Loading extension file: %s'), f)
                 mod_name, file_ext = os.path.splitext(os.path.split(f)[-1])
                 ext_path = os.path.join(path, f)
                 if file_ext.lower() == '.py' and not mod_name.startswith('_'):
-                    mod = imp.load_source(mod_name, ext_path)
+                    if full_module != '':
+                        mod = import_module('.'.join([full_module, mod_name]))
+                    else:
+                        mod = import_module(mod_name, ext_path)
                     ext_name = mod_name[0].upper() + mod_name[1:]
                     new_ext_class = getattr(mod, ext_name, None)
                     if not new_ext_class:
@@ -571,6 +576,19 @@ class ExtensionManager(object):
             raise exceptions.Error(_("Found duplicate extension: %s") %
                                    alias)
         self.extensions[alias] = ext
+
+    def _full_module_path(self, path, mod_names=None):
+        path = os.path.abspath(path)
+        if not mod_names:
+            mod_names = []
+        if os.path.isdir(path):
+            if os.path.exists(os.path.join(path, '__init__.py')):
+                path, add_mod = os.path.split(path)
+                if add_mod:
+                    mod_names.append(add_mod)
+                    return self._full_module_path(path, mod_names=mod_names)
+        mod_names.reverse()
+        return '.'.join(mod_names)
 
 
 class PluginAwareExtensionManager(ExtensionManager):
@@ -601,9 +619,6 @@ class PluginAwareExtensionManager(ExtensionManager):
         return supports_extension
 
     def _plugins_implement_interface(self, extension):
-        if(not hasattr(extension, "get_plugin_interface") or
-           extension.get_plugin_interface() is None):
-            return True
         for plugin in self.plugins.values():
             if isinstance(plugin, extension.get_plugin_interface()):
                 return True

@@ -18,8 +18,8 @@
 # @author: Dan Wendlandt, Nicira, Inc
 #
 
+from abc import ABCMeta
 from abc import abstractmethod
-
 from oslo.config import cfg
 
 from neutron.api import extensions
@@ -29,6 +29,7 @@ from neutron.common import exceptions as qexception
 from neutron import manager
 from neutron.plugins.common import constants
 from neutron import quota
+from neutron.services.service_base import ServicePluginBase
 
 
 # L3 Exceptions
@@ -216,8 +217,22 @@ class L3(extensions.ExtensionDescriptor):
         else:
             return {}
 
+    @classmethod
+    def get_plugin_interface(cls):
+        return RouterPluginBase
 
-class RouterPluginBase(object):
+
+class RouterPluginBase(ServicePluginBase):
+    __metaclass__ = ABCMeta
+
+    def get_plugin_description(self):
+        return 'Router Description'
+
+    def get_plugin_name(self):
+        return constants.CORE
+
+    def get_plugin_type(self):
+        return constants.CORE
 
     @abstractmethod
     def create_router(self, context, router):

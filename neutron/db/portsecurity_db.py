@@ -59,7 +59,7 @@ class NetworkSecurityBinding(model_base.BASEV2):
                             cascade='delete', lazy='joined'))
 
 
-class PortSecurityDbMixin(object):
+class PortSecurityDbMixin(psec.PortSecurityPluginBase):
     """Mixin class to add port security."""
 
     def _process_network_port_security_create(

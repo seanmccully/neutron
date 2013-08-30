@@ -290,6 +290,10 @@ class Securitygroup(extensions.ExtensionDescriptor):
         else:
             return {}
 
+    @classmethod
+    def get_plugin_interface(cls):
+        return SecurityGroupPluginBase
+
 
 class SecurityGroupPluginBase(object):
     __metaclass__ = ABCMeta
